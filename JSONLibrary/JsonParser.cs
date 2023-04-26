@@ -194,19 +194,14 @@ namespace JSONLibrary
         public static int GetJsonListCount(string property)
         {
             int count = 0;
-            while (true)
+            string element = GetJsonListElement(property, count);
+            while (element != String.Empty)
             {
-                try
-                {
-                    if (GetJsonListElement(property, count) == String.Empty)
-                        return count;
-                    count++;
-                }
-                catch
-                {
-                    return count;
-                }
+                Console.WriteLine("element " + count);
+                count++;
+                element = GetJsonListElement(property, count);
             }
+            return count;
         }
 
         /// <summary>
