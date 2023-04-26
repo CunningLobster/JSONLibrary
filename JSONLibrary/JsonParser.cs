@@ -155,9 +155,9 @@ namespace JSONLibrary
             string propBody = string.Empty;
 
             if (property.Trim()[0] == '[')
-                propBody = property.Substring(1);
+                propBody = property.TrimStart('[').TrimEnd(']');
             else if (property[property.IndexOf(":") + 1] == '[')
-                propBody = property.Substring(property.IndexOf(":") + 2);
+                propBody = property.Substring(property.IndexOf(":") + 1).TrimStart('[').TrimEnd(']');
             else
                 throw new Exception("Не является свойством-коллекцией");
 
@@ -166,24 +166,27 @@ namespace JSONLibrary
             for (int i = 0; i <= index; i++)
             {
                 propBody = propBody.Substring(startIndex).TrimStart();
-                if (string.IsNullOrEmpty(propBody)) return string.Empty;
-
-                if (propBody[0] == '{')
-                    result = CutPropWithBreakets(propBody, '{', '}');
-                else if (propBody[0] == '[')
-                    result = CutPropWithBreakets(propBody, '[', ']');
-                else
-                    result = GetSinglePropertyValue(propBody);
-
-                if (i == index)
-                    return result.Trim(',');
+                if (string.IsNullOrEmpty(propBody))
+                    throw new IndexOutOfRangeException();
                 else
                 {
-                    startIndex = result.Length + 1;
-                    result = string.Empty;
+                    if (propBody[0] == '{')
+                        result = CutPropWithBreakets(propBody, '{', '}');
+                    else if (propBody[0] == '[')
+                        result = CutPropWithBreakets(propBody, '[', ']');
+                    else
+                        result = GetSinglePropertyValue(propBody);
+
+                    if (i == index)
+                        result = result.Trim(',');
+                    else
+                    {
+                        startIndex = result.Length + 1;
+                        result = string.Empty;
+                    }
                 }
             }
-            return string.Empty;
+            return result;
         }
 
         /// <summary>
@@ -195,11 +198,18 @@ namespace JSONLibrary
         {
             int count = 0;
             string element = GetJsonListElement(property, count);
+
             while (element != String.Empty)
             {
-                Console.WriteLine("element " + count);
-                count++;
-                element = GetJsonListElement(property, count);
+                try
+                {
+                    count++;
+                    element = GetJsonListElement(property, count);
+                }
+                catch
+                {
+                    break;
+                }
             }
             return count;
         }
