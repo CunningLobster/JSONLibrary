@@ -152,12 +152,14 @@ namespace JSONLibrary
         /// <returns>Элемент Json свойства-коллекции</returns>
         public static string GetJsonListElement(string property, int index)
         {
-            int colonIndex = property.IndexOf(":");
-            if (property[colonIndex + 1] != '[')
-                return "Не является свойством-коллекцией";
+            string propBody = string.Empty;
 
-            //Тело свойства внутри квадратных скобок
-            string propBody = property.Substring(colonIndex + 2);
+            if (property.Trim()[0] == '[')
+                propBody = property.Substring(1);
+            else if (property[property.IndexOf(":") + 1] == '[')
+                propBody = property.Substring(property.IndexOf(":") + 2);
+            else
+                throw new Exception("Не является свойством-коллекцией");
 
             int startIndex = 0;
             string result = string.Empty;
